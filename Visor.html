@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Presentación Interactiva Pro</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: sans-serif; }
+
+        /* Contenedor de la Diapositiva */
+        .slide-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            /* REEMPLAZA CON EL NOMBRE DE TU IMAGEN EXPORTADA */
+            background: url('diapositiva1.jpg') no-repeat center center;
+            background-size: cover;
+        }
+
+        /* Botón o área invisible para activar el visor */
+        .trigger-area {
+            position: absolute;
+            top: 40%;    /* Ajusta según dónde quieras el clic */
+            left: 10%;   /* Ajusta según dónde quieras el clic */
+            padding: 15px 25px;
+            background: rgba(44, 62, 80, 0.9);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Ventana Emergente (Modal) */
+        .modal-overlay {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            position: relative;
+            width: 85%;
+            height: 85%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px; right: 15px;
+            font-size: 30px;
+            color: #333;
+            cursor: pointer;
+            z-index: 1001;
+            font-weight: bold;
+        }
+
+        iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container">
+        <button class="trigger-area" onclick="openModal()">Abrir Visor Interactivo</button>
+    </div>
+
+    <div class="modal-overlay" id="myModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <iframe src="https://panoraven.com/es/embed/5gIsDHGFdh"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('myModal');
+
+        function openModal() {
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        // Cerrar también si presionas la tecla Esc
+        window.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") closeModal();
+        });
+    </script>
+
+</body>
+</html>
