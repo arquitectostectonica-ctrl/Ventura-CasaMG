@@ -2,56 +2,89 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Presentación Ventura - Enlaces Personalizados</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentación Ventura - Layout Fijo</title>
     <style>
         :root { --accent: #2c3e50; }
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #111; font-family: 'Helvetica Neue', Arial, sans-serif; }
 
-        .slider-wrapper { width: 100vw; height: 100vh; display: flex; overflow: hidden; }
-        .slider { display: flex; width: 100vw; height: 100vh; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* Contenedor que siempre mantiene la proporción 16:9 */
+        .slider-wrapper { 
+            position: relative;
+            width: 100vw; 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+
+        .slider { 
+            display: flex; 
+            width: 100vw; 
+            height: 100vh; 
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
 
         .slide {
-            min-width: 100vw; height: 100vh;
-            background-size: contain; background-repeat: no-repeat; background-position: center;
+            min-width: 100vw; 
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
         }
 
-        /* Estilo base del botón */
+        /* ESTE ES EL TRUCO: Un contenedor interno que mide exactamente lo que mide la imagen */
+        .image-container {
+            position: relative;
+            aspect-ratio: 16 / 9;
+            height: 100%; /* En pantallas anchas se limita por la altura */
+            max-width: 100%; /* En pantallas altas (celular) se limita por el ancho */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* Ajuste para que el contenedor no se salga en pantallas verticales (celulares) */
+        @media (aspect-ratio: < 16/9) {
+            .image-container {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        /* Estilo del botón */
         .btn-interactivo {
-            padding: 12px 24px;
+            padding: 1% 2%;
             background: rgba(255, 255, 255, 0.9);
             color: var(--accent);
             border: 1px solid rgba(0,0,0,0.1);
             border-radius: 2px;
             cursor: pointer;
-            font-size: 10px;
-            letter-spacing: 2px;
+            font-size: clamp(8px, 1vw, 12px); /* Tamaño de letra que escala */
+            letter-spacing: 1px;
             text-transform: uppercase;
             box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-            transition: 0.3s;
             position: absolute;
             z-index: 500;
+            white-space: nowrap;
         }
-        .btn-interactivo:hover { background: #fff; transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
 
-        /* POSICIONES ESPECÍFICAS SOLICITADAS */
-        .pos-izquierda-abajo { bottom: 9px; left: 173px; }
-        .pos-derecha-abajo { bottom: 9px; right: 173px; }
+        /* POSICIONES BASADAS EN PORCENTAJE (Para que no se muevan nunca) */
+        /* Ajusta estos valores % para clavarlos en tu diseño */
+        .pos-izquierda-abajo { bottom: 1%; left: 3%; }
+        .pos-derecha-abajo { bottom: 1%; right: 3%; }
 
-        /* Visor y Overlay */
+        /* Visor y navegación (igual que antes) */
         #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; }
         #modalVisor {
             display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 90vw; height: 90vh; background: white; z-index: 1001; border-radius: 4px; overflow: hidden;
         }
         .modal-header { background: #f8f9fa; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .close-modal { background: #333; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 3px; font-weight: bold; }
-        
-        /* El iframe se ajusta al contenedor */
+        .close-modal { background: #333; color: white; border: none; padding: 5px 15px; cursor: pointer; }
         #visorIframe { width: 100%; height: calc(100% - 45px); border: none; }
-
-        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.05); color: white; padding: 20px 10px; border: none; z-index: 800; cursor: pointer; transition: 0.3s; }
-        .nav-arrow:hover { background: rgba(255,255,255,0.2); }
+        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.05); color: white; padding: 20px 10px; border: none; z-index: 800; cursor: pointer; }
         .next { right: 0; } .prev { left: 0; }
     </style>
 </head>
@@ -59,26 +92,32 @@
 
     <div class="slider-wrapper">
         <div class="slider" id="slider">
-            <div class="slide" style="background-image: url('Diapositiva1.JPG');"></div>
-            <div class="slide" style="background-image: url('Diapositiva2.JPG');"></div>
-            <div class="slide" style="background-image: url('Diapositiva3.JPG');"></div>
+            <div class="slide"><div class="image-container" style="background-image: url('Diapositiva1.JPG');"></div></div>
+            <div class="slide"><div class="image-container" style="background-image: url('Diapositiva2.JPG');"></div></div>
+            <div class="slide"><div class="image-container" style="background-image: url('Diapositiva3.JPG');"></div></div>
             
-            <div class="slide" style="background-image: url('Diapositiva4.JPG');">
-                <button class="btn-interactivo pos-izquierda-abajo" onclick="openVisor('https://panoraven.com/es/embed/5gIsDHGFdh')">Abrir Visor 360°</button>
+            <div class="slide">
+                <div class="image-container" style="background-image: url('Diapositiva4.JPG');">
+                    <button class="btn-interactivo pos-izquierda-abajo" onclick="openVisor('https://panoraven.com/es/embed/5gIsDHGFdh')">Abrir Visor 360°</button>
+                </div>
             </div>
 
-            <div class="slide" style="background-image: url('Diapositiva5.JPG');">
-                <button class="btn-interactivo pos-derecha-abajo" onclick="openVisor('https://panoraven.com/es/embed/fInaBZNPGc')">Abrir Visor 360°</button>
+            <div class="slide">
+                <div class="image-container" style="background-image: url('Diapositiva5.JPG');">
+                    <button class="btn-interactivo pos-derecha-abajo" onclick="openVisor('https://panoraven.com/es/embed/fInaBZNPGc')">Abrir Visor 360°</button>
+                </div>
             </div>
 
-            <div class="slide" style="background-image: url('Diapositiva6.JPG');"></div>
+            <div class="slide"><div class="image-container" style="background-image: url('Diapositiva6.JPG');"></div></div>
 
-            <div class="slide" style="background-image: url('Diapositiva7.JPG');">
-                <button class="btn-interactivo pos-derecha-abajo" onclick="openVisor('https://panoraven.com/es/embed/8pcnlBDUKc')">Abrir Visor 360°</button>
+            <div class="slide">
+                <div class="image-container" style="background-image: url('Diapositiva7.JPG');">
+                    <button class="btn-interactivo pos-derecha-abajo" onclick="openVisor('https://panoraven.com/es/embed/8pcnlBDUKc')">Abrir Visor 360°</button>
+                </div>
             </div>
 
-            <div class="slide" style="background-image: url('Diapositiva8.JPG');"></div>
-            <div class="slide" style="background-image: url('Diapositiva9.JPG');"></div>
+            <div class="slide"><div class="image-container" style="background-image: url('Diapositiva8.JPG');"></div></div>
+            <div class="slide"><div class="image-container" style="background-image: url('Diapositiva9.JPG');"></div></div>
         </div>
     </div>
 
@@ -88,7 +127,7 @@
     <div id="overlay" onclick="closeVisor()"></div>
     <div id="modalVisor">
         <div class="modal-header">
-            <span id="modalTitle" style="font-size: 10px; color: #888; letter-spacing: 1px; text-transform: uppercase;">Vista Inmersiva</span>
+            <span style="font-size: 10px; color: #888; letter-spacing: 1px;">VISTA INMERSIVA</span>
             <button class="close-modal" onclick="closeVisor()">×</button>
         </div>
         <iframe id="visorIframe" src="" allowfullscreen></iframe>
@@ -106,9 +145,8 @@
             slider.style.transform = `translateX(-${currentIdx * 100}vw)`;
         }
 
-        // Ahora la función recibe el link específico
         function openVisor(url) {
-            iframe.src = url; // Asignamos el link dinámicamente
+            iframe.src = url;
             document.getElementById('modalVisor').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         }
@@ -116,7 +154,7 @@
         function closeVisor() {
             document.getElementById('modalVisor').style.display = 'none';
             document.getElementById('overlay').style.display = 'none';
-            iframe.src = ""; // Limpiamos el iframe al cerrar para ahorrar recursos
+            iframe.src = "";
         }
 
         window.addEventListener('keydown', (e) => {
