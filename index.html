@@ -2,95 +2,104 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presentación Ventura - Layout Fijo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Presentación Ventura - Mobile & PC</title>
     <style>
-        :root { --accent: #2c3e50; }
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #111; font-family: 'Helvetica Neue', Arial, sans-serif; }
-
-        /* Contenedor que siempre mantiene la proporción 16:9 */
-        .slider-wrapper { 
-            position: relative;
-            width: 100vw; 
-            height: 100vh; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
+        :root { --accent: #2c3e50; --btn-bg: rgba(255, 255, 255, 0.95); }
+        
+        * { box-sizing: border-box; touch-action: pan-y; } /* Permite scroll vertical pero bloquea rebotes */
+        
+        body, html { 
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            overflow: hidden; background: #000; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        .slider { 
-            display: flex; 
-            width: 100vw; 
-            height: 100vh; 
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); 
+        /* Contenedor principal para Swiping */
+        .slider-wrapper {
+            width: 100%; height: 100%;
+            overflow: hidden; position: relative;
+        }
+
+        .slider {
+            display: flex; width: 100%; height: 100%;
+            transition: transform 0.4s ease-out;
+            will-change: transform;
         }
 
         .slide {
-            min-width: 100vw; 
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            min-width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
             position: relative;
         }
 
-        /* ESTE ES EL TRUCO: Un contenedor interno que mide exactamente lo que mide la imagen */
+        /* Contenedor de imagen que respeta proporciones sin recortar */
         .image-container {
             position: relative;
-            aspect-ratio: 16 / 9;
-            height: 100%; /* En pantallas anchas se limita por la altura */
-            max-width: 100%; /* En pantallas altas (celular) se limita por el ancho */
+            width: 100%; height: 100%;
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
+            max-width: 100%; max-height: 100%;
         }
 
-        /* Ajuste para que el contenedor no se salga en pantallas verticales (celulares) */
-        @media (aspect-ratio: < 16/9) {
-            .image-container {
-                width: 100%;
-                height: auto;
-            }
-        }
-
-        /* Estilo del botón */
+        /* BOTÓN INTERACTIVO - Adaptado para dedos (Touch targets) */
         .btn-interactivo {
-            padding: 1% 2%;
-            background: rgba(255, 255, 255, 0.9);
+            position: absolute;
+            padding: 12px 20px;
+            background: var(--btn-bg);
             color: var(--accent);
             border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 2px;
-            cursor: pointer;
-            font-size: clamp(8px, 1vw, 12px); /* Tamaño de letra que escala */
-            letter-spacing: 1px;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 600;
             text-transform: uppercase;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-            position: absolute;
-            z-index: 500;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            z-index: 100;
+            cursor: pointer;
             white-space: nowrap;
         }
 
-        /* POSICIONES BASADAS EN PORCENTAJE (Para que no se muevan nunca) */
-        /* Ajusta estos valores % para clavarlos en tu diseño */
-        .pos-izquierda-abajo { bottom: 1%; left: 3%; }
-        .pos-derecha-abajo { bottom: 1%; right: 3%; }
+        /* Posiciones optimizadas para móvil (%) */
+        .pos-izquierda-abajo { bottom: 15%; left: 10%; }
+        .pos-derecha-abajo { bottom: 15%; right: 10%; }
 
-        /* Visor y navegación (igual que antes) */
-        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; }
-        #modalVisor {
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90vw; height: 90vh; background: white; z-index: 1001; border-radius: 4px; overflow: hidden;
+        /* Ajustes para pantallas horizontales (PC o Celular girado) */
+        @media (min-aspect-ratio: 1/1) {
+            .pos-izquierda-abajo { bottom: 8%; left: 15%; }
+            .pos-derecha-abajo { bottom: 8%; right: 15%; }
         }
-        .modal-header { background: #f8f9fa; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
-        .close-modal { background: #333; color: white; border: none; padding: 5px 15px; cursor: pointer; }
-        #visorIframe { width: 100%; height: calc(100% - 45px); border: none; }
-        .nav-arrow { position: fixed; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.05); color: white; padding: 20px 10px; border: none; z-index: 800; cursor: pointer; }
-        .next { right: 0; } .prev { left: 0; }
+
+        /* Indicadores de navegación (Flechas más visibles) */
+        .nav-ui {
+            position: fixed; bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            display: flex; gap: 40px; z-index: 200;
+        }
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            color: white; border: none; width: 50px; height: 50px;
+            border-radius: 50%; font-size: 20px; cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+
+        /* MODAL VISOR (95% en móvil para no perderse) */
+        #modalVisor {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: #fff;
+            z-index: 2000; flex-direction: column;
+        }
+        .modal-header {
+            height: 50px; background: #eee; display: flex; 
+            justify-content: space-between; align-items: center; padding: 0 15px;
+        }
+        #visorIframe { width: 100%; height: calc(100% - 50px); border: none; }
     </style>
 </head>
 <body>
 
-    <div class="slider-wrapper">
+    <div class="slider-wrapper" id="touchArea">
         <div class="slider" id="slider">
             <div class="slide"><div class="image-container" style="background-image: url('Diapositiva1.JPG');"></div></div>
             <div class="slide"><div class="image-container" style="background-image: url('Diapositiva2.JPG');"></div></div>
@@ -98,13 +107,13 @@
             
             <div class="slide">
                 <div class="image-container" style="background-image: url('Diapositiva4.JPG');">
-                    <button class="btn-interactivo pos-izquierda-abajo" onclick="openVisor('https://panoraven.com/es/embed/5gIsDHGFdh')">Abrir Visor 360°</button>
+                    <button class="btn-interactivo pos-izquierda-abajo" onclick="openVisor('https://panoraven.com/es/embed/5gIsDHGFdh')">Ver 360°</button>
                 </div>
             </div>
 
             <div class="slide">
                 <div class="image-container" style="background-image: url('Diapositiva5.JPG');">
-                    <button class="btn-interactivo pos-derecha-abajo" onclick="openVisor('https://panoraven.com/es/embed/fInaBZNPGc')">Abrir Visor 360°</button>
+                    <button class="btn-interactivo pos-derecha-abajo" onclick="openVisor('https://panoraven.com/es/embed/fInaBZNPGc')">Ver 360°</button>
                 </div>
             </div>
 
@@ -112,7 +121,7 @@
 
             <div class="slide">
                 <div class="image-container" style="background-image: url('Diapositiva7.JPG');">
-                    <button class="btn-interactivo pos-derecha-abajo" onclick="openVisor('https://panoraven.com/es/embed/8pcnlBDUKc')">Abrir Visor 360°</button>
+                    <button class="btn-interactivo pos-derecha-abajo" onclick="openVisor('https://panoraven.com/es/embed/8pcnlBDUKc')">Ver 360°</button>
                 </div>
             </div>
 
@@ -121,20 +130,22 @@
         </div>
     </div>
 
-    <button class="nav-arrow prev" onclick="move(-1)">&#10094;</button>
-    <button class="nav-arrow next" onclick="move(1)">&#10095;</button>
+    <div class="nav-ui">
+        <button class="nav-btn" onclick="move(-1)">←</button>
+        <button class="nav-btn" onclick="move(1)">→</button>
+    </div>
 
-    <div id="overlay" onclick="closeVisor()"></div>
     <div id="modalVisor">
         <div class="modal-header">
-            <span style="font-size: 10px; color: #888; letter-spacing: 1px;">VISTA INMERSIVA</span>
-            <button class="close-modal" onclick="closeVisor()">×</button>
+            <span style="font-size: 12px; font-weight: bold;">RECORRIDO 360°</span>
+            <button onclick="closeVisor()" style="padding: 5px 15px;">CERRAR ×</button>
         </div>
         <iframe id="visorIframe" src="" allowfullscreen></iframe>
     </div>
 
     <script>
         let currentIdx = 0;
+        let startX = 0;
         const slider = document.getElementById('slider');
         const iframe = document.getElementById('visorIframe');
 
@@ -142,22 +153,30 @@
             currentIdx += dir;
             if (currentIdx > 8) currentIdx = 0;
             if (currentIdx < 0) currentIdx = 8;
-            slider.style.transform = `translateX(-${currentIdx * 100}vw)`;
+            slider.style.transform = `translateX(-${currentIdx * 100}%)`;
         }
+
+        // --- LÓGICA DE GESTO TÁCTIL (SWIPE) ---
+        const touchArea = document.getElementById('touchArea');
+        touchArea.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+        touchArea.addEventListener('touchend', e => {
+            let endX = e.changedTouches[0].clientX;
+            if (startX - endX > 50) move(1); // Swipe izquierda -> Siguiente
+            if (startX - endX < -50) move(-1); // Swipe derecha -> Anterior
+        });
 
         function openVisor(url) {
             iframe.src = url;
-            document.getElementById('modalVisor').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('modalVisor').style.display = 'flex';
         }
 
         function closeVisor() {
             document.getElementById('modalVisor').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
             iframe.src = "";
         }
 
-        window.addEventListener('keydown', (e) => {
+        // Flechas teclado
+        window.addEventListener('keydown', e => {
             if (e.key === "ArrowRight") move(1);
             if (e.key === "ArrowLeft") move(-1);
             if (e.key === "Escape") closeVisor();
